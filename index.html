@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار الأدب العربي</title>
+    <!--  -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #046b4d; /* deep green */
+            --secondary-color: #fdf5e6; /* cream */
+            --text-color: #333;
+            --border-color: #ddd;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+            --hover-color: #f0f0f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .quiz-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+        }
+
+        .quiz-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        /* --- شاشة اختيار الفئة --- */
+        #category-screen {
+            padding: 30px;
+            text-align: center;
+        }
+
+        #category-screen h2 {
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+        }
+
+        #category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .category-btn {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--primary-color);
+        }
+
+        .category-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- شاشة الاختبار --- */
+        #quiz-screen {
+            padding: 30px;
+            display: none; /* مخفي افتراضيًا */
+        }
+
+        .quiz-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        #progress {
+            color: var(--primary-color);
+        }
+
+        #score {
+            color: var(--text-color);
+        }
+
+        #question-container {
+            margin-bottom: 25px;
+        }
+
+        #question-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        #options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-btn {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.1rem;
+            text-align: right;
+            padding: 15px 20px;
+            background-color: #f9f9f9;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background-color: var(--hover-color);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        /* حالات الأزرار */
+        .option-btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+        
+        .option-btn.incorrect {
+            background-color: var(--incorrect-color);
+            color: white;
+            border-color: var(--incorrect-color);
+        }
+
+        .option-btn.selected {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        #feedback {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        #feedback.correct {
+            color: var(--correct-color);
+            background-color: #e6f7ec;
+        }
+        #feedback.incorrect {
+            color: var(--incorrect-color);
+            background-color: #fde8e9;
+        }
+
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .nav-btn {
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #back-to-menu-btn {
+            background-color: #f0f0f0;
+            color: var(--text-color);
+        }
+        #back-to-menu-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        #prev-btn, #next-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        #prev-btn:hover, #next-btn:hover {
+            background-color: #03533b;
+        }
+
+        #prev-btn:disabled, #next-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        /* شاشة النهاية */
+        #results-screen {
+            text-align: center;
+            padding: 40px;
+        }
+        #results-screen h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        #final-score {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+        #restart-quiz-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1>اختبار الأدب العربي</h1>
+        </div>
+
+        <!-- شاشة اختيار الفئة -->
+        <div id="category-screen">
+            <h2>اختر العصر لبدء الاختبار:</h2>
+            <div id="category-grid">
+                <!-- سيتم ملء الأزرار هنا بواسطة JavaScript -->
+            </div>
+        </div>
+
+        <!-- شاشة الاختبار -->
+        <div id="quiz-screen">
+            <div class="quiz-info">
+                <span id="progress">سؤال 1 / 10</span>
+                <span id="score">النتيجة: 0</span>
+            </div>
+
+            <div id="question-container">
+                <p id="question-text">نص السؤال سيظهر هنا...</p>
+            </div>
+
+            <div id="options-container">
+                <!-- سيتم ملء الخيارات هنا بواسطة JavaScript -->
+            </div>
+
+            <div id="feedback"></div>
+
+            <div class="quiz-nav">
+                <button class="nav-btn" id="prev-btn">السابق</button>
+                <button class="nav-btn" id="back-to-menu-btn">العودة للقائمة</button>
+                <button class="nav-btn" id="next-btn">التالي</button>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- 
+      *************************************************
+      هذا السطر يقوم بربط ملف الأسئلة الخارجي بالصفحة
+      *************************************************
+    -->
+    <script src="questions.js"></script>
+    
+    <script>
+        // --- 1. بنك الأسئلة ---
+        // تم نقل الأسئلة إلى "questions.js" وجلبها عبر السطر أعلاه.
+        // المتغير "quizData" أصبح الآن متاحاً هنا.
+
+        // --- 2. متغيرات حالة الاختبار ---
+        let currentCategory = "";
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let categoryQuestions = [];
+        let userAnswers = {}; // لتخزين إجابات المستخدم
+
+        // --- 3. عناصر الواجهة ---
+        const categoryScreen = document.getElementById('category-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const categoryGrid = document.getElementById('category-grid');
+        
+        const progressEl = document.getElementById('progress');
+        const scoreEl = document.getElementById('score');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackEl = document.getElementById('feedback');
+        
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const backToMenuBtn = document.getElementById('back-to-menu-btn');
+
+        // --- 4. الدوال الأساسية ---
+
+        /** تهيئة التطبيق وبدء شاشة الفئات */
+        function init() {
+            categoryGrid.innerHTML = ''; // مسح الأزرار القديمة
+            quizScreen.style.display = 'none';
+            categoryScreen.style.display = 'block';
+
+            // التأكد من أن quizData تم تحميله
+            if (typeof quizData === 'undefined') {
+                categoryGrid.innerHTML = '<p style="color: red;">خطأ: لم يتم تحميل ملف الأسئلة (questions.js) بشكل صحيح.</p>';
+                return;
+            }
+
+            const categories = Object.keys(quizData);
+            categories.forEach(category => {
+                const btn = document.createElement('button');
+                btn.innerText = category;
+                btn.className = 'category-btn';
+                btn.onclick = () => selectCategory(category);
+                categoryGrid.appendChild(btn);
+            });
+        }
+
+        /** اختيار فئة وبدء الاختبار */
+        function selectCategory(category) {
+            currentCategory = category;
+            categoryQuestions = quizData[category];
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = {}; // إعادة تعيين الإجابات عند بدء اختبار جديد
+
+            categoryScreen.style.display = 'none';
+            quizScreen.style.display = 'block';
+            
+            // إخفاء شاشة النتائج إذا كانت ظاهرة
+            const resultsScreen = document.getElementById('results-screen');
+            if (resultsScreen) resultsScreen.remove();
+            
+            // إظهار عناصر الاختبار القياسية
+            document.getElementById('question-container').style.display = 'block';
+            optionsContainer.style.display = 'flex';
+            document.querySelector('.quiz-nav').style.display = 'flex';
+            feedbackEl.style.display = 'block'; // التأكد من ظهورها
+
+
+            loadQuestion(currentQuestionIndex);
+        }
+
+        /** تحميل السؤال وعرضه */
+        function loadQuestion(index) {
+            // مسح التغذية الراجعة السابقة
+            feedbackEl.innerText = '';
+            feedbackEl.className = '';
+            
+            const question = categoryQuestions[index];
+            questionTextEl.innerText = question.question;
+            optionsContainer.innerHTML = ''; // مسح الخيارات القديمة
+
+            const userAnswer = userAnswers[index];
+
+            question.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.innerText = option;
+                btn.className = 'option-btn';
+                
+                if (userAnswer) {
+                    // إذا أجاب المستخدم على هذا السؤال من قبل
+                    btn.disabled = true;
+                    if (option === question.answer) {
+                        btn.classList.add('correct');
+                    } else if (option === userAnswer.selected) {
+                        btn.classList.add('incorrect');
+                    }
+                } else {
+                    // إذا لم يتم الرد على السؤال بعد
+                    btn.onclick = () => handleOptionClick(option, question.answer, btn);
+                }
+                
+                optionsContainer.appendChild(btn);
+            });
+
+            // تحديث المعلومات والأزرار
+            updateInfo();
+            updateNavButtons();
+        }
+
+        /** التعامل مع اختيار إجابة */
+        function handleOptionClick(selectedOption, correctAnswer, clickedButton) {
+            // منع الإجابة مرتين
+            if (userAnswers[currentQuestionIndex]) return;
+
+            const isCorrect = (selectedOption === correctAnswer);
+            
+            // تخزين الإجابة
+            userAnswers[currentQuestionIndex] = { selected: selectedOption, isCorrect: isCorrect };
+
+            // تحديث النتيجة
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerText = 'إجابة صحيحة!';
+                feedbackEl.className = 'feedback correct';
+            } else {
+                feedbackEl.innerText = `إجابة خاطئة! الإجابة الصحيحة هي: ${correctAnswer}`;
+                feedbackEl.className = 'feedback incorrect';
+            }
+
+            // تعطيل جميع الأزرار وتلوينها
+            Array.from(optionsContainer.children).forEach(btn => {
+                btn.disabled = true;
+                if (btn.innerText === correctAnswer) {
+                    btn.classList.add('correct');
+                } else if (btn.innerText === selectedOption && !isCorrect) {
+                    btn.classList.add('incorrect');
+                }
+            });
+
+            updateInfo();
+        }
+
+        /** تحديث شريط المعلومات (النتيجة والتقدم) */
+        function updateInfo() {
+            progressEl.innerText = `سؤال ${currentQuestionIndex + 1} / ${categoryQuestions.length}`;
+            scoreEl.innerText = `النتيجة: ${score}`;
+        }
+
+        /** تحديث حالة أزرار التنقل */
+        function updateNavButtons() {
+            prevBtn.disabled = (currentQuestionIndex === 0);
+            
+            if (currentQuestionIndex === categoryQuestions.length - 1) {
+                nextBtn.innerText = "إنهاء الاختبار";
+            } else {
+                nextBtn.innerText = "التالي";
+            }
+        }
+
+        /** عرض شاشة النتائج النهائية */
+        function showFinalResults() {
+            // إخفاء عناصر الاختبار
+            document.getElementById('question-container').style.display = 'none';
+            optionsContainer.style.display = 'none';
+            feedbackEl.style.display = 'none';
+            document.querySelector('.quiz-nav').style.display = 'none';
+            
+            // إنشاء وعرض شاشة النتائج
+            let resultsScreen = document.getElementById('results-screen');
+            if (!resultsScreen) {
+                resultsScreen = document.createElement('div');
+                resultsScreen.id = 'results-screen';
+                quizScreen.appendChild(resultsScreen);
+            }
+            resultsScreen.style.display = 'block';
+
+            resultsScreen.innerHTML = `
+                <h2>اكتمل الاختبار!</h2>
+                <p id="final-score">نتيجتك النهائية هي: ${score} من ${categoryQuestions.length}</p>
+                <button class="nav-btn" id="restart-quiz-btn">العودة للقائمة الرئيسية</button>
+            `;
+            
+            document.getElementById('restart-quiz-btn').onclick = init; // العودة للبداية
+        }
+
+        // --- 5. ربط الأحداث ---
+
+        prevBtn.onclick = () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion(currentQuestionIndex);
+            }
+        };
+
+        nextBtn.onclick = () => {
+            // يجب على المستخدم الإجابة أولاً
+            if (!userAnswers[currentQuestionIndex]) {
+                feedbackEl.innerText = 'الرجاء اختيار إجابة أولاً!';
+                feedbackEl.className = 'feedback incorrect';
+                return;
+            }
+
+            if (currentQuestionIndex < categoryQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion(currentQuestionIndex);
+            } else {
+                // هذا هو السؤال الأخير
+                showFinalResults();
+            }
+        };
+
+        backToMenuBtn.onclick = () => {
+            // (اختياري: يمكنك إضافة رسالة تأكيد هنا)
+            init(); // العودة إلى شاشة الفئات
+        };
+
+        // --- 6. بدء التطبيق ---
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
